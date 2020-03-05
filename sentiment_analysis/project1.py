@@ -2,10 +2,7 @@ from string import punctuation, digits
 import numpy as np
 import random
 
-# Part I
 
-
-#pragma: coderesponse template
 def get_order(n_samples):
     try:
         with open(str(n_samples) + '.txt') as fp:
@@ -16,10 +13,8 @@ def get_order(n_samples):
         indices = list(range(n_samples))
         random.shuffle(indices)
         return indices
-#pragma: coderesponse end
 
 
-#pragma: coderesponse template
 def hinge_loss_single(feature_vector, label, theta, theta_0):
     """
     Finds the hinge loss on a single data point given specific classification
@@ -36,9 +31,7 @@ def hinge_loss_single(feature_vector, label, theta, theta_0):
     Returns: A real number representing the hinge loss associated with the
     given data point and parameters.
     """
-    a = 0
-    for i in range(len(feature_vector)):
-        a = a+ feature_vector[i]*theta[i]
+    a = np.matmul(feature_vector, theta)
     loss = (a+theta_0)*label
 
     if loss >= 1:
@@ -59,22 +52,17 @@ def hinge_loss_full(feature_matrix, labels, theta, theta_0):
         theta - A numpy array describing the linear classifier.
         theta_0 - A real valued number representing the offset parameter.
 
-
     Returns: A real number representing the hinge loss associated with the
     given dataset and parameters. This number should be the average hinge
     loss across all of the points in the feature matrix.
     """
     loss = 0
     for i,j in zip(feature_matrix, labels):
-        print(np.matmul(i*theta))
-         
-
-
-def perceptron_single_step_update(
-        feature_vector,
-        label,
-        current_theta,
-        current_theta_0):
+        loss = loss + hinge_loss_single(i, j, theta, theta_0)
+    loss = loss/len(feature_matrix)
+    return loss
+    
+def perceptron_single_step_update(feature_vector,label,current_theta, current_theta_0):
     """
     Properly updates the classification parameter, theta and theta_0, on a
     single step of the perceptron algorithm.
@@ -92,12 +80,9 @@ def perceptron_single_step_update(
     real valued number with the value of theta_0 after the current updated has
     completed.
     """
-    # Your code here
-    raise NotImplementedError
-#pragma: coderesponse end
 
 
-#pragma: coderesponse template
+
 def perceptron(feature_matrix, labels, T):
     """
     Runs the full perceptron algorithm on a given set of data. Runs T
