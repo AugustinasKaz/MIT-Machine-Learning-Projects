@@ -80,7 +80,16 @@ def perceptron_single_step_update(feature_vector,label,current_theta, current_th
     real valued number with the value of theta_0 after the current updated has
     completed.
     """
+    a = np.matmul(feature_vector, current_theta)
+    loss = (a+current_theta_0)*label
 
+    if loss <= 0:
+        theta_update = current_theta + np.dot(feature_vector, label)
+        theta_0_update = current_theta_0 + label
+        tuple = (theta_update, theta_0_update)
+    else:
+        tuple = (current_theta, current_theta_0)
+    return tuple
 
 
 def perceptron(feature_matrix, labels, T):
@@ -108,16 +117,16 @@ def perceptron(feature_matrix, labels, T):
     theta_0, the offset classification parameter, after T iterations through
     the feature matrix.
     """
-    # Your code here
+    (nsamples, nfeatures) = feature_matrix.shape
+    theta = np.zeros(nfeatures)
+    theta_0 = 0.0
     for t in range(T):
-        for i in get_order(feature_matrix.shape[0]):
-            # Your code here
-            pass
-    raise NotImplementedError
-#pragma: coderesponse end
+        for i in get_order(nsamples):
+            theta, theta_0 = perceptron_single_step_update(feature_matrix[i], labels[i], theta, theta_0)
+    return (theta, theta_0)
 
 
-#pragma: coderesponse template
+
 def average_perceptron(feature_matrix, labels, T):
     """
     Runs the average perceptron algorithm on a given set of data. Runs T
@@ -147,19 +156,18 @@ def average_perceptron(feature_matrix, labels, T):
     Hint: It is difficult to keep a running average; however, it is simple to
     find a sum and divide.
     """
-    # Your code here
-    raise NotImplementedError
-#pragma: coderesponse end
+    (nsamples, nfeatures) = feature_matrix.shape
+    theta, theta_sum = np.zeros(nfeatures), np.zeros(nfeatures) 
+    theta_0, theta_0_sum = 0.0, 0.0
+    for t in range(T):
+        for i in get_order(nsamples):
+            theta, theta_0 = perceptron_single_step_update(feature_matrix[i], labels[i], theta, theta_0)
+            theta_sum += theta
+            theta_0_sum += theta_0
+    return (theta_sum/(len(feature_matrix)*T), theta_0_sum/(len(feature_matrix)*T))
 
 
-#pragma: coderesponse template
-def pegasos_single_step_update(
-        feature_vector,
-        label,
-        L,
-        eta,
-        current_theta,
-        current_theta_0):
+def pegasos_single_step_update(feature_vector,label,L,eta,current_theta,current_theta_0):
     """
     Properly updates the classification parameter, theta and theta_0, on a
     single step of the Pegasos algorithm
@@ -179,12 +187,19 @@ def pegasos_single_step_update(
     real valued number with the value of theta_0 after the current updated has
     completed.
     """
-    # Your code here
-    raise NotImplementedError
-#pragma: coderesponse end
+    a = np.matmul(feature_vector, current_theta)
+    loss = (a+current_theta_0)*label
+
+    if loss <= 1:
+        theta_update = (1-eta*L)*current_theta + np.dot(eta*feature_vector, label)
+        theta_0_update = current_theta_0 + (eta * label)
+        tuple = (theta_update, theta_0_update) 
+    else:
+        theta_update = (1-eta*L)*current_theta
+        tuple = (theta_update, current_theta_0) 
+    return tuple
 
 
-#pragma: coderesponse template
 def pegasos(feature_matrix, labels, T, L):
     """
     Runs the Pegasos algorithm on a given set of data. Runs T
