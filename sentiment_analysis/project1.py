@@ -229,14 +229,18 @@ def pegasos(feature_matrix, labels, T, L):
     number with the value of the theta_0, the offset classification
     parameter, found after T iterations through the feature matrix.
     """
-    # Your code here
-    raise NotImplementedError
-#pragma: coderesponse end
+    (nsamples, nfeatures) = feature_matrix.shape
+    theta = np.zeros(nfeatures)
+    theta_0 = 0.0
+    tmp = 0
+    for t in range(T):
+        for i in get_order(nsamples):
+            tmp = tmp + 1
+            eta = 1/np.sqrt(tmp)
+            theta, theta_0 = pegasos_single_step_update(feature_matrix[i],labels[i],L,eta,theta,theta_0)
+    return (theta, theta_0)
+    
 
-# Part II
-
-
-#pragma: coderesponse template
 def classify(feature_matrix, theta, theta_0):
     """
     A classification function that uses theta and theta_0 to classify a set of
@@ -254,19 +258,10 @@ def classify(feature_matrix, theta, theta_0):
     given theta and theta_0. If a prediction is GREATER THAN zero, it should
     be considered a positive classification.
     """
-    # Your code here
-    raise NotImplementedError
-#pragma: coderesponse end
+    return (np.matmul(feature_matrix,theta) + theta_0 > 1e-7) * 2.0 - 1 
 
 
-#pragma: coderesponse template
-def classifier_accuracy(
-        classifier,
-        train_feature_matrix,
-        val_feature_matrix,
-        train_labels,
-        val_labels,
-        **kwargs):
+def classifier_accuracy(classifier,train_feature_matrix,val_feature_matrix,train_labels,val_labels,**kwargs):
     """
     Trains a linear classifier and computes accuracy.
     The classifier is trained on the train data. The classifier's
@@ -292,12 +287,15 @@ def classifier_accuracy(
     trained classifier on the training data and the second element is the
     accuracy of the trained classifier on the validation data.
     """
-    # Your code here
-    raise NotImplementedError
-#pragma: coderesponse end
+    theta, theta_0 = classifier(train_feature_matrix, train_labels, **kwargs)
+    train_prediction = classify(train_feature_matrix, theta, theta_0)
+    val_prediction = classify(val_feature_matrix, theta, theta_0)
+    train_accuracy = accuracy(train_prediction, train_labels)
+    val_accuracy = accuracy(val_prediction, val_labels)
 
+    return(train_accuracy, val_accuracy)
 
-#pragma: coderesponse template
+    
 def extract_words(input_string):
     """
     Helper function for bag_of_words()

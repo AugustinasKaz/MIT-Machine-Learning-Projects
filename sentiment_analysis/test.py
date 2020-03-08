@@ -308,7 +308,7 @@ def check_pegasos():
 def check_classify():
     ex_name = "Classify"
 
-    feature_matrix = np.array([[1, 1], [1, 1], [1, 1]])
+    feature_matrix = np.array( [[1, 1], [1, 1], [1, 1]] )
     theta = np.array([1, 1])
     theta_0 = 0
     exp_res = np.array([1, 1, 1])
