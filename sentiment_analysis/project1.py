@@ -311,25 +311,31 @@ def extract_words(input_string):
 
 
 #pragma: coderesponse template
-def bag_of_words(texts):
+def bag_of_words(texts, stop_words):
     """
     Inputs a list of string reviews
     Returns a dictionary of unique unigrams occurring over the input
 
     Feel free to change this code as guided by Problem 9
     """
-    # Your code here
-    dictionary = {} # maps word to unique index
+    count = 0
+    count2 = 0
+    result = []
     for text in texts:
         word_list = extract_words(text)
-        for word in word_list:
+        count += len(word_list)
+        result_word_list  = [word for word in word_list if word not in stop_words]
+        count2 += len(result_word_list) 
+        result.append(result_word_list) 
+
+    dictionary = {} # maps word to unique index
+    for review in result:
+        for word in review:
             if word not in dictionary:
                 dictionary[word] = len(dictionary)
+    
     return dictionary
-#pragma: coderesponse end
 
-
-#pragma: coderesponse template
 def extract_bow_feature_vectors(reviews, dictionary):
     """
     Inputs a list of string reviews
@@ -340,8 +346,7 @@ def extract_bow_feature_vectors(reviews, dictionary):
 
     Feel free to change this code as guided by Problem 9
     """
-    # Your code here
-
+    
     num_reviews = len(reviews)
     feature_matrix = np.zeros([num_reviews, len(dictionary)])
 
@@ -351,10 +356,8 @@ def extract_bow_feature_vectors(reviews, dictionary):
             if word in dictionary:
                 feature_matrix[i, dictionary[word]] = 1
     return feature_matrix
-#pragma: coderesponse end
 
 
-#pragma: coderesponse template
 def accuracy(preds, targets):
     """
     Given length-N vectors containing predicted and target labels,
